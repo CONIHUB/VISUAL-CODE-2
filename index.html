@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Álbum de Imágenes</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #album {
+            display: flex;
+            width: 800px; /* Ancho total del álbum */
+            transition: transform 0.5s ease-in-out;
+            cursor: grab;
+        }
+
+        .imagen {
+            flex: 0 0 100%; /* Ancho de cada imagen */
+            height: 500px; /* Altura de las imágenes */
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        #prevButton,
+        #nextButton {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 24px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #prevButton {
+            left: 10px;
+        }
+
+        #nextButton {
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <button id="prevButton" onclick="previousSlide()">Anterior</button>
+    <div id="album">
+        <div class="imagen" style="background-image: url('L1.jpg');"></div>
+        <div class="imagen" style="background-image: url('L2.jpg');"></div>
+        <div class="imagen" style="background-image: url('L3.jpg');"></div>
+        <div class="imagen" style="background-image: url('L4.jpg');"></div>
+        <div class="imagen" style="background-image: url('L5.jpg');"></div>
+        <div class="imagen" style="background-image: url('L6.jpg');"></div>
+        <div class="imagen" style="background-image: url('L3.jpg');"></div>
+        <div class="imagen" style="background-image: url('L2.jpg');"></div>
+    </div>
+    <button id="nextButton" onclick="nextSlide()">Siguiente</button>
+
+    <script>
+        const album = document.getElementById('album');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        let currentIndex = 0;
+        let isDragging = false;
+        let startPosition = 0;
+        let deltaX = 0;
+
+        album.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startPosition = e.clientX - album.getBoundingClientRect().left;
+            album.style.cursor = 'grabbing';
+        });
+
+        album.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            deltaX = e.clientX - album.getBoundingClientRect().left - startPosition;
+            album.style.transform = `translateX(${deltaX}px)`;
+        });
+
+        album.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            album.style.cursor = 'grab';
+            if (Math.abs(deltaX) > 100) {
+                if (deltaX < 0) {
+                    nextSlide();
+                } else {
+                    previousSlide();
+                }
+            } else {
+                updateAlbum();
+            }
+        });
+
+        album.addEventListener('mouseleave', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            album.style.cursor = 'grab';
+            updateAlbum();
+        });
+
+        function previousSlide() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateAlbum();
+            }
+        }
+
+        function nextSlide() {
+            if (currentIndex < album.children.length - 1) {
+                currentIndex++;
+                updateAlbum();
+            }
+        }
+
+        function updateAlbum() {
+            const translateX = -currentIndex * 100 + '%';
+            album.style.transform = `translateX(${translateX})`;
+        }
+    </script>
+</body>
+</html>
